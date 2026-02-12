@@ -1,4 +1,3 @@
-import { FaFileAlt } from "react-icons/fa";
 import { FaCircleCheck } from "react-icons/fa6";
 import { HiOutlinePhotograph } from "react-icons/hi";
 import { IoArrowBack, IoDocumentTextOutline } from "react-icons/io5";
@@ -76,7 +75,7 @@ function Details() {
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
               Meeting Participants
             </label>
-            <div className="w-full bg-gray-50 border border-gray-300 rounded-sm px-4 py-2 text-sm text-gray-700 min-h-[60px]">
+            <div className="w-full bg-gray-50 border border-gray-300 rounded-sm px-4 py-2 text-sm text-gray-700 min-h-15">
               {data.participants || "Not provided"}
             </div>
           </div>
