@@ -168,11 +168,11 @@ function Form() {
       onSubmit={handleSubmit}
       className="w-full max-w-5xl mx-auto bg-white rounded-lg shadow-sm"
     >
-      <div className="flex justify-between items-center border-b border-b-gray-300 px-8 py-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 border-b border-b-gray-300 px-4 sm:px-6 md:px-8 py-3 sm:py-4">
         <div className="">
           <div className=" flex justify-start items-center gap-1">
             <FaFileAlt className="w-4 h-4 text-blue-500" />
-            <h1 className="text-lg font-bold text-gray-900">
+            <h1 className="text-base sm:text-lg font-bold text-gray-900">
               Minutes of Meeting (MOM)
             </h1>
           </div>
@@ -184,14 +184,14 @@ function Form() {
 
         <button
           type="button"
-          className="flex items-center gap-2 bg-amber-100 text-amber-600 text-xs font-semibold px-4 py-2 rounded-sm hover:bg-orange-100 transition"
+          className="flex items-center gap-1 sm:gap-2 bg-amber-100 text-amber-600 text-xs font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-sm hover:bg-orange-100 transition whitespace-nowrap"
         >
           <MdLockClock size={18} />
           STAGE EXIT LOCK
         </button>
       </div>
 
-      <div className="px-8 py-4 space-y-5">
+      <div className="px-4 sm:px-6 md:px-8 py-4 space-y-5">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
@@ -351,9 +351,9 @@ function Form() {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-t-gray-300 bg-gray-50 px-8 py-3 flex justify-between items-center rounded-b-lg">
-        <div className="flex items-start gap-1 max-w-md">
-          <IoShieldCheckmark className="w-6 h-6 text-gray-500" />
+      <div className="border-t border-t-gray-300 bg-gray-50 px-4 sm:px-6 md:px-8 py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 rounded-b-lg">
+        <div className="flex items-start gap-1 max-w-md text-left">
+          <IoShieldCheckmark className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 flex-shrink-0" />
           <label
             htmlFor="legal-disclaimer"
             className="text-xs text-gray-500 leading-relaxed text-justify"
@@ -365,18 +365,18 @@ function Form() {
           </label>
         </div>
 
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center w-full sm:w-auto">
           <button
             type="button"
             onClick={handleCancel}
-            className="cursor-pointer text-gray-700 border border-gray-700 rounded-sm font-semibold text-sm px-4 py-2 hover:text-gray-900 hover:bg-gray-200 transition"
+            className="cursor-pointer text-gray-700 border border-gray-700 rounded-sm font-semibold text-sm px-3 sm:px-4 py-2 hover:text-gray-900 hover:bg-gray-200 transition flex-1 sm:flex-none"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-4 py-2 rounded-sm shadow-sm transition flex items-center gap-2"
+            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm px-3 sm:px-4 py-2 rounded-sm shadow-sm transition flex items-center justify-center gap-2 flex-1 sm:flex-none"
           >
             Share the MOM
             <IoMdSend />

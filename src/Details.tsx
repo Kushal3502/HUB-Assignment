@@ -41,23 +41,12 @@ function Details() {
   return (
     <div className="w-full max-w-5xl mx-auto bg-white rounded-lg shadow-sm">
       {/* Header - Same as Form */}
-      <div className="flex justify-between items-center border-b border-b-gray-300 px-8 py-4">
-        <div>
-          <div className="flex justify-start items-center gap-1">
-            <FaFileAlt className="w-4 h-4 text-blue-500" />
-            <h1 className="text-lg font-bold text-gray-900">
-              Minutes of Meeting (MOM)
-            </h1>
-          </div>
-
-          <p className="text-xs text-gray-500 mt-1">
-            Submit official meeting summary to unlock next project stage.
-          </p>
-        </div>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 border-b border-b-gray-300 px-4 sm:px-6 md:px-8 py-3 sm:py-4">
+        
 
         <button
           onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-semibold transition"
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm font-semibold transition whitespace-nowrap"
         >
           <IoArrowBack size={18} />
           Back to Form
@@ -65,7 +54,7 @@ function Details() {
       </div>
 
       {/* Success Banner */}
-      <div className="bg-green-50 border-l-4 border-green-500 px-8 py-3 mx-8 mt-4 rounded-sm">
+      <div className="bg-green-50 border-l-4 border-green-500 px-4 sm:px-6 md:px-8 py-3 mx-4 sm:mx-6 md:mx-8 mt-4 rounded-sm">
         <div className="flex items-center gap-3">
           <FaCircleCheck className=" bg-green-500 rounded-full"/>
           <div>
@@ -80,7 +69,7 @@ function Details() {
       </div>
 
       {/* Content - Same layout as Form */}
-      <div className="px-8 py-4 space-y-5">
+      <div className="px-4 sm:px-6 md:px-8 py-4 space-y-5">
         {/* Meeting Participants and Date/Time - Same grid as Form */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
