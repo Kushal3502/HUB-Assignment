@@ -25,7 +25,7 @@ function Form() {
     images: [],
   });
 
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [dragActive, setDragActive] = useState(false);
