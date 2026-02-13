@@ -10,7 +10,9 @@ import { IoMdSend } from "react-icons/io";
 
 interface FormData {
   participants: string;
-  dateTime: string;
+  date: string;
+  startTime: string;
+  endTime: string;
   minutes: string;
   images: File[];
 }
@@ -20,12 +22,18 @@ function Form() {
 
   const [formData, setFormData] = useState<FormData>({
     participants: "",
-    dateTime: "",
+    date: "",
+    startTime: "",
+    endTime: "",
     minutes: "",
     images: [],
   });
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState({
+    participants: "",
+    date: "",
+    minutes: "",
+  });
 
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -38,48 +46,36 @@ function Form() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileSelect = async (files: FileList | null) => {
-    if (!files) return;
+  const handleFileSelect = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
 
-    const fileArray = Array.from(files);
-    const validFiles: File[] = [];
-    const previewPromises: Promise<string>[] = [];
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
 
-    fileArray.forEach((file) => {
-      // Validate file type and size
-      if (
+    Array.from(files).forEach((file) => {
+      // Only accept images and PDFs under 10MB
+      const isValid =
         (file.type.startsWith("image/") || file.type === "application/pdf") &&
-        file.size <= 10 * 1024 * 1024 // 10MB
-      ) {
-        validFiles.push(file);
+        file.size <= 10 * 1024 * 1024;
 
-        // Create preview promise
-        const previewPromise = new Promise<string>((resolve) => {
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              resolve(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-          } else {
-            // For PDFs, return a placeholder
-            resolve("pdf");
-          }
-        });
+      if (isValid) {
+        newFiles.push(file);
 
-        previewPromises.push(previewPromise);
+        // Create blob URL for preview
+        if (file.type.startsWith("image/")) {
+          newPreviews.push(URL.createObjectURL(file));
+        } else {
+          // PDF placeholder
+          newPreviews.push("pdf");
+        }
       }
     });
 
-    // Wait for all previews to load
-    if (validFiles.length > 0) {
-      const newPreviews = await Promise.all(previewPromises);
-
+    if (newFiles.length > 0) {
       setFormData((prev) => ({
         ...prev,
-        images: [...prev.images, ...validFiles],
+        images: [...prev.images, ...newFiles],
       }));
-
       setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
@@ -87,21 +83,14 @@ function Form() {
   const handleDrag = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
+    setDragActive(e.type === "dragenter" || e.type === "dragover");
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFileSelect(e.dataTransfer.files);
-    }
+    handleFileSelect(e.dataTransfer.files);
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,8 +108,27 @@ function Form() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.participants.trim()) {
+      setError((prev) => ({
+        ...prev,
+        participants: "Please fill in the Participants field",
+      }));
+      return;
+    }
+
+    if (!formData.date.trim()) {
+      setError((prev) => ({
+        ...prev,
+        date: "Please fill in the Date field",
+      }));
+      return;
+    }
+
     if (!formData.minutes.trim()) {
-      setError("Please fill in the Minutes of Meeting field");
+      setError((prev) => ({
+        ...prev,
+        minutes: "Please fill in the Minutes of Meeting field",
+      }));
       return;
     }
 
@@ -129,7 +137,9 @@ function Form() {
     // Log form data (in real app, this would be sent to backend)
     console.log("Form submitted:", {
       participants: formData.participants,
-      dateTime: formData.dateTime,
+      date: formData.date,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
       minutes: formData.minutes,
       imageCount: formData.images.length,
       images: formData.images,
@@ -144,7 +154,9 @@ function Form() {
     // Reset form
     setFormData({
       participants: "",
-      dateTime: "",
+      date: "",
+      startTime: "",
+      endTime: "",
       minutes: "",
       images: [],
     });
@@ -155,7 +167,9 @@ function Form() {
     if (confirm("Are you sure you want to cancel? All data will be lost.")) {
       setFormData({
         participants: "",
-        dateTime: "",
+        date: "",
+        startTime: "",
+        endTime: "",
         minutes: "",
         images: [],
       });
@@ -192,7 +206,7 @@ function Form() {
       </div>
 
       <div className="px-4 sm:px-6 md:px-8 py-4 space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
               Meeting Participants
@@ -205,20 +219,56 @@ function Form() {
               onChange={handleInputChange}
               className="w-full bg-gray-50 border border-gray-300 rounded-sm px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+
+            {error.participants && (
+              <p className="text-xs text-red-500 mt-1">{error.participants}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
               Date/Time
             </label>
-            <input
-              type="text"
-              name="dateTime"
-              placeholder="Oct 24, 2023 | 10:30 AM - 11:45 AM (GMT +5:30)"
-              value={formData.dateTime}
-              onChange={handleInputChange}
-              className="w-full bg-gray-100 border border-gray-300 rounded-sm px-4 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div className="flex flex-wrap items-center gap-2 px-3 sm:px-4 py-2 border border-gray-300 rounded-sm bg-gray-50 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent">
+              <input
+                type="date"
+                name="date"
+                placeholder="Select Date"
+                value={formData.date}
+                onChange={handleInputChange}
+                className="outline-none bg-transparent text-sm min-w-20 flex-shrink-0"
+              />
+
+              <span className="text-gray-400 hidden sm:inline">|</span>
+
+              <input
+                type="time"
+                name="startTime"
+                placeholder="Select Start Time"
+                value={formData.startTime}
+                onChange={handleInputChange}
+                className="outline-none bg-transparent text-sm min-w-20 flex-shrink-0"
+              />
+
+              <span className="text-gray-400">-</span>
+
+              <input
+                type="time"
+                name="endTime"
+                placeholder="Select End Time"
+                value={formData.endTime}
+                onChange={handleInputChange}
+                className="outline-none bg-transparent text-sm min-w-20 flex-shrink-0"
+              />
+
+              <span className="text-xs text-gray-500 whitespace-nowrap">
+                (GMT +5:30)
+              </span>
+            </div>
+
+            {error.date && (
+              <p className="text-xs text-red-500 mt-1">{error.date}</p>
+            )}
           </div>
         </div>
 
@@ -231,7 +281,9 @@ function Form() {
             <span className="text-sm text-gray-400">Required Field</span>
           </div>
 
-          {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+          {error.minutes && (
+            <p className="text-xs text-red-500 mt-1">{error.minutes}</p>
+          )}
 
           <textarea
             name="minutes"
@@ -243,7 +295,7 @@ function Form() {
 • Customer liked kitchen layout; requested granite countertop switch.
 • Agreed on 15th Nov for next site visit.
 • Budget ceiling confirmed at $45,000.`}
-            required
+            // required
           />
 
           <div className="flex items-start gap-2 text-xs text-gray-500 mt-1">
@@ -353,7 +405,7 @@ function Form() {
       {/* Footer */}
       <div className="border-t border-t-gray-300 bg-gray-50 px-4 sm:px-6 md:px-8 py-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 rounded-b-lg">
         <div className="flex items-start gap-1 max-w-md text-left">
-          <IoShieldCheckmark className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 flex-shrink-0" />
+          <IoShieldCheckmark className="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 shrink-0" />
           <label
             htmlFor="legal-disclaimer"
             className="text-xs text-gray-500 leading-relaxed text-justify"
